@@ -24,9 +24,7 @@ import { clearInterceptorTokens } from './utils';
 describe('CLI > Server token create', () => {
   const processArgvSpy = vi.spyOn(process, 'argv', 'get');
 
-  const numberOfColorCharactersInTokenValue = 10;
-  const expectedTokenBase64urlLength =
-    convertHexLengthToBase64urlLength(INTERCEPTOR_TOKEN_VALUE_HEX_LENGTH) + numberOfColorCharactersInTokenValue;
+  const expectedTokenBase64urlLength = convertHexLengthToBase64urlLength(INTERCEPTOR_TOKEN_VALUE_HEX_LENGTH);
 
   const serverStartHelpOutput = [
     'zimic-interceptor server token create',
