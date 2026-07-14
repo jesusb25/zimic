@@ -8,7 +8,9 @@ import { isClientSide } from '@/utils/environment';
 import { usingIgnoredConsole } from '@tests/utils/console';
 import { usingHttpInterceptor } from '@tests/utils/interceptors';
 
+import InvalidHttpInterceptorRequestSavingError from '../../errors/InvalidHttpInterceptorRequestSavingError';
 import RequestSavingSafeLimitExceededError from '../../errors/RequestSavingSafeLimitExceededError';
+import { createHttpInterceptor } from '../../factory';
 import { DEFAULT_REQUEST_SAVING_SAFE_LIMIT } from '../../HttpInterceptorImplementation';
 import { HttpInterceptorOptions } from '../../types/options';
 import { HttpInterceptorRequestSaving } from '../../types/public';
@@ -436,6 +438,75 @@ export function declareRequestSavingHttpInterceptorTests(options: RuntimeSharedH
           expect(console.warn).toHaveBeenCalledTimes(0);
         });
       });
+    });
+  });
+
+  describe('Validation', () => {
+    it('should throw an error if the error request saving is not an object', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          // @ts-expect-error Forcingan invalid request saving type.
+          requestSaving: 'invalid',
+        });
+      }).toThrow(new InvalidHttpInterceptorRequestSavingError('invalid', 'an object'));
+    });
+
+    it('should throw an error if the request saving is null', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          // @ts-expect-error Forcing an invalid request saving type.
+          requestSaving: null,
+        });
+      }).toThrow(new InvalidHttpInterceptorRequestSavingError(null, 'an object'));
+    });
+
+    it('should throw an error if the request saving is an array', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          // @ts-expect-error Forcing an invalid request saving type.
+          requestSaving: [],
+        });
+      }).toThrow(new InvalidHttpInterceptorRequestSavingError([], 'an object'));
+    });
+
+    it('should throw an error if request saving enabled is not a boolean', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          // @ts-expect-error Forcing an invalid enabled type.
+          requestSaving: { enabled: 'yes' },
+        });
+      }).toThrow(new InvalidHttpInterceptorRequestSavingError('yes', 'a boolean'));
+    });
+
+    it('should throw an error if request saving safeLimit is not an integer', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          requestSaving: { safeLimit: 1.5 },
+        });
+      }).toThrow(new InvalidHttpInterceptorRequestSavingError(1.5, 'a non-negative integer'));
+    });
+
+    it('should throw an error if request saving safeLimit is negative', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          requestSaving: { safeLimit: -1 },
+        });
+      }).toThrow(new InvalidHttpInterceptorRequestSavingError(-1, 'a non-negative integer'));
+    });
+
+    it('should not throw an error for a valid request saving configuration', () => {
+      expect(() => {
+        createHttpInterceptor({
+          ...interceptorOptions,
+          requestSaving: { enabled: true, safeLimit: 10 },
+        });
+      }).not.toThrow();
     });
   });
 

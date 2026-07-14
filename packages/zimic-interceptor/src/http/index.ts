@@ -3,6 +3,7 @@ import {
   InvalidJSONError as HttpInvalidJSONError,
 } from '@zimic/http';
 
+export { default as InvalidHttpInterceptorRequestSavingError } from './interceptor/errors/InvalidHttpInterceptorRequestSavingError';
 export { default as RunningHttpInterceptorError } from './interceptor/errors/RunningHttpInterceptorError';
 export { default as NotRunningHttpInterceptorError } from './interceptor/errors/NotRunningHttpInterceptorError';
 export { default as UnknownHttpInterceptorPlatformError } from './interceptor/errors/UnknownHttpInterceptorPlatformError';
